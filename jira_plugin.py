@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
-from irc3.plugins.command import command
 import irc3
 import requests
+
+
+def privmsg(rule):
+    p = r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :'
+    return irc3.event(p + rule)
 
 
 @irc3.plugin
@@ -10,25 +14,8 @@ class Plugin:
     def __init__(self, bot):
         self.bot = bot
 
-    # @irc3.event(irc3.rfc.JOIN)
-    # def say_hi(self, mask, channel, **kw):
-    #     """Say hi when someone join a channel"""
-    #     if mask.nick != self.bot.nick:
-    #         self.bot.privmsg(channel, 'Hi %s!' % mask.nick)
-    #     else:
-    #         self.bot.privmsg(channel, 'Hi!')
-
-    @command(permission='view')
-    def echo(self, mask, target, args):
-        """Echo
-
-            %%echo <message>...
-        """
-        yield ' '.join(args['<message>'])
-
-    @irc3.event(r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) (?P<event>(PRIVMSG|NOTICE)) (?P<target>\S+) :.*(?P<issue>(FL|QA)-\d+).*$')
-    def show_issue(self, mask, event, target, issue):
-        print(issue, target, mask, event)
+    @privmsg(r'.*\b(?P<issue>(FL|QA)-\d+)\b')
+    def show_issue(self, mask, target, issue):
         if not target.startswith('#'):
             target = mask.split('!')[0]
         url = 'https://bugs.funtoo.org/rest/api/2/issue/' + issue
@@ -42,11 +29,11 @@ class Plugin:
             "Status: {status_name} ({status_cat})\017 {link}"
         )
         message = template.format(
-            id=issue,
+            id=result['key'],
             summary=result['fields']['summary'],
             type=result['fields']['issuetype']['name'],
             status_name=result['fields']['status']['name'],
             status_cat=result['fields']['status']['statusCategory']['name'],
-            link='https://bugs.funtoo.org/browse/' + issue,
+            link='https://bugs.funtoo.org/browse/' + result['key'],
         )
         self.bot.privmsg(target, message)
