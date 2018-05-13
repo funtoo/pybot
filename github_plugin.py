@@ -30,7 +30,7 @@ class Plugin:
             result['commit']['commit']['committer']['date'],
             "%Y-%m-%dT%H:%M:%SZ")
         relative_last_update = now - last_update
-        hours = int(relative_last_update.seconds / 3600)
+        hours = round(relative_last_update.seconds / 3600)
         if hours < 1:
             minutes = int((relative_last_update.seconds / 60) // 5 * 5)
             if minutes == 0:
@@ -56,7 +56,7 @@ class Plugin:
                 if t > cur_time:
                     next_update = datetime.combine(now.date(), t)
         relative_next_update = next_update - now
-        hours = int(relative_next_update.seconds / 3600)
+        hours = round(relative_next_update.seconds / 3600)
         if hours < 1:
             minutes = int((relative_next_update.seconds / 60) // 10 * 10) + 10
             message = (
