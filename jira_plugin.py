@@ -43,7 +43,7 @@ class Plugin:
             if hook:
                 hook(result)
             return self.web.Response(status=200)
-        return self.web.Response(status=405)
+        return self.web.Response(body="It works!", status=200)
 
     def wh_jira_issue_created(self, result):
         template = (
