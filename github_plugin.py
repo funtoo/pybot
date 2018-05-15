@@ -37,13 +37,13 @@ class Plugin:
                 message = "Kits were just updated."
             else:
                 message = (
-                    "Last kit updates were about {} minutes ago."
+                    "Last kits update was about {} minutes ago."
                 ).format(minutes)
         elif hours == 1:
-            message = "Last kit updates were about an hour ago."
+            message = "Last kits update was about an hour ago."
         else:
             message = (
-                "Last kit updates were about {} hours ago."
+                "Last kits update was about {} hours ago."
             ).format(hours)
         self.bot.privmsg(target, message)
 
@@ -60,12 +60,12 @@ class Plugin:
         if hours < 1:
             minutes = int((relative_next_update.seconds / 60) // 10 * 10) + 10
             message = (
-                "Next kit updates expected in about {} minutes."
+                "Next kits update is expected in about {} minutes."
             ).format(minutes)
         elif hours == 1:
-            message = "Next kit updates expected in about an hour."
+            message = "Next kits update is expected in about an hour."
         else:
             message = (
-                "Next kit updates expected in about {} hours."
+                "Next kits update is expected in about {} hours."
             ).format(hours)
         self.bot.privmsg(target, message)
