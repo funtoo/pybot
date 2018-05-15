@@ -37,7 +37,7 @@ class Plugin:
                 if request.headers.get('X-Api-Key') != self.webhook_key:
                     return self.web.Response(status=403)
             result = await request.json()
-            print(result['webhookEvent'])
+            self.bot.log.info(result)
             hook_name = result['webhookEvent'].replace(':', '_')
             hook = getattr(self, 'wh_{}'.format(hook_name), None)
             if hook:
@@ -54,7 +54,7 @@ class Plugin:
             user=result['user']['name'],
             summary=result['issue']['fields']['summary'],
             type=result['issue']['fields']['issuetype']['name'],
-            link='https://bugs.funtoo.org/browse/' + result['key'],
+            link='https://bugs.funtoo.org/browse/' + result['issue']['key'],
         )
         self.bot.notice('#funtoo-dev', message)
 

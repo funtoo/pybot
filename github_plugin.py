@@ -14,10 +14,10 @@ class Plugin:
         self.bot = bot
 
     @command(permission='view')
-    def kit_updates(self, mask, target, *args, **kwargs):
-        """Kit Updates
+    def kits_update(self, mask, target, *args, **kwargs):
+        """Show last kits update and expected next kits update time.
 
-            %%kit_updates
+            %%kits_update
         """
         if not target.startswith('#'):
             target = mask.nick
@@ -55,6 +55,7 @@ class Plugin:
             for t in self.KIT_UPDATES:
                 if t > cur_time:
                     next_update = datetime.combine(now.date(), t)
+                    break
         relative_next_update = next_update - now
         hours = round(relative_next_update.seconds / 3600)
         if hours < 1:
