@@ -58,7 +58,7 @@ class Plugin:
         )
         self.bot.notice('#funtoo-dev', message)
 
-    @privmsg(r'.*\b(?P<issue>(FL|QA)-\d+)\b')
+    @privmsg(r'.*\b(?P<issue>(FL|QA|KEYC)-\d+)\b')
     def show_issue(self, mask, target, issue):
         if not target.startswith('#'):
             target = mask.split('!')[0]
