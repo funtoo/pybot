@@ -71,7 +71,8 @@ class Plugin:
                 "\x0313{user}\017 commented on \x0311{id}\017: "
                 "\x039{summary}\017 {link}"
             )
-            msg_data['summary'] = result['comment']['body'][:100]
+            msg_data['summary'] = \
+                result['comment']['body'].splitlines()[0][:100]
             msg_data['link'] += '#comment-' + result['comment']['id']
         elif event in ['issue_generic', 'issue_updated']:
             old_status, new_status = None, None
