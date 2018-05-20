@@ -58,6 +58,65 @@ class Plugin:
         )
         self.bot.notice('#funtoo-dev', message)
 
+    def wh_jira_issue_updated(self, result):
+        msg_data = dict(
+            id=result['key'],
+            user=result['user']['name'],
+            summary=result['issue']['fields']['summary'],
+            link='https://bugs.funtoo.org/browse/' + result['issue']['key'],
+        )
+        template = None
+        event = result['issue_event_type_name']
+        if event == 'issue_commented':
+            template = (
+                "\x0313{user}\017 commented on \x0311\: \x039{summary}\017 "
+                "{link}"
+            )
+            msg_data['summary'] = result['comment']['body']
+            msg_data['link'] += '#comment-' + result['comment']['id']
+        elif event in ['issue_generic', 'issue_update']:
+            old_status, new_status = None, None
+            old_assignee, new_assignee = None, None
+            for change in result['changelog']['items']:
+                if change['field'] == 'status':
+                    old_status = change['fromString']
+                    new_status = change['toString']
+                elif change['field'] == 'assignee':
+                    old_assignee = change['from']
+                    new_assignee = change['to']
+            changes = []
+            if old_assignee != new_assignee:
+                if new_assignee == msg_data['user']:
+                    message = "assigned himself"
+                elif not new_assignee:
+                    if old_assignee == msg_data['user']:
+                        message = "unassigned himself"
+                    else:
+                        message = "unassigned \x0313{old}\017"
+                else:
+                    message = "assigned \x0313{new}"
+                if old_assignee and new_assignee:
+                    if old_assignee == msg_data['user']:
+                        message += " (instead of himself)"
+                    else:
+                        message += " (instead of \x0313{old}\017)"
+                changes.append(
+                    message.format(old=old_assignee, new=new_assignee))
+            if old_status != new_status:
+                message = "set status \x0313{new}\017 (was: \x0313{old}\017)"
+                changes.append(
+                    message.format(old=old_status, new=new_status))
+            if changes:
+                template = (
+                    "\x0313{user}\017 {changes} on \x0311{id}\017 ("
+                    "\x039{summary}\017) {link}"
+                )
+                msg_data['changes'] = ' and '.join(changes)
+        if not template:
+            return
+        message = template.format(**msg_data)
+        self.bot.notice('#funtoo-dev', message)
+
     @privmsg(r'.*\b(?P<issue>(FL|QA|KEYC)-\d+)\b')
     def show_issue(self, mask, target, issue):
         if not target.startswith('#'):
