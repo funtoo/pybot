@@ -68,7 +68,7 @@ class Plugin:
         event = result['issue_event_type_name']
         if event == 'issue_commented':
             template = (
-                "\x0313{user}\017 commented on \x0311{id}\017: "
+                "\x0311{user}\017 commented on \x0311{id}\017: "
                 "\x039{summary}\017 {link}"
             )
             msg_data['summary'] = \
@@ -108,7 +108,7 @@ class Plugin:
                     message.format(old=old_status, new=new_status))
             if changes:
                 template = (
-                    "\x0313{user}\017 {changes} on \x0311{id}\017 ("
+                    "\x0311{user}\017 {changes} on \x0311{id}\017 ("
                     "\x039{summary}\017) {link}"
                 )
                 msg_data['changes'] = ' and '.join(changes)
