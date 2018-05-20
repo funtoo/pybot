@@ -37,7 +37,6 @@ class Plugin:
                 if request.headers.get('X-Api-Key') != self.webhook_key:
                     return self.web.Response(status=403)
             result = await request.json()
-            self.bot.log.info(result)
             hook_name = result['webhookEvent'].replace(':', '_')
             hook = getattr(self, 'wh_{}'.format(hook_name), None)
             if hook:
@@ -60,7 +59,7 @@ class Plugin:
 
     def wh_jira_issue_updated(self, result):
         msg_data = dict(
-            id=result['key'],
+            id=result['issue']['key'],
             user=result['user']['name'],
             summary=result['issue']['fields']['summary'],
             link='https://bugs.funtoo.org/browse/' + result['issue']['key'],
@@ -69,12 +68,12 @@ class Plugin:
         event = result['issue_event_type_name']
         if event == 'issue_commented':
             template = (
-                "\x0313{user}\017 commented on \x0311\: \x039{summary}\017 "
-                "{link}"
+                "\x0313{user}\017 commented on \x0311{id}\017: "
+                "\x039{summary}\017 {link}"
             )
-            msg_data['summary'] = result['comment']['body']
+            msg_data['summary'] = result['comment']['body'][:100]
             msg_data['link'] += '#comment-' + result['comment']['id']
-        elif event in ['issue_generic', 'issue_update']:
+        elif event in ['issue_generic', 'issue_updated']:
             old_status, new_status = None, None
             old_assignee, new_assignee = None, None
             for change in result['changelog']['items']:
@@ -94,7 +93,7 @@ class Plugin:
                     else:
                         message = "unassigned \x0313{old}\017"
                 else:
-                    message = "assigned \x0313{new}"
+                    message = "assigned \x0313{new}\017"
                 if old_assignee and new_assignee:
                     if old_assignee == msg_data['user']:
                         message += " (instead of himself)"
