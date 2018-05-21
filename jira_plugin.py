@@ -2,10 +2,9 @@
 import irc3
 import requests
 
+from utils import privmsg
 
-def privmsg(rule):
-    p = r'^(@(?P<tags>\S+) )?:(?P<mask>\S+!\S+@\S+) PRIVMSG (?P<target>\S+) :'
-    return irc3.event(p + rule)
+__all__ = ['Plugin']
 
 
 @irc3.plugin
@@ -31,18 +30,13 @@ class Plugin:
         self.server = self.bot.create_task(
             self.bot.loop.create_server(server, host, port))
 
-    async def handler(self, request):
-        if request.method == 'POST':
-            if self.webhook_key:
-                if request.headers.get('X-Api-Key') != self.webhook_key:
-                    return self.web.Response(status=403)
-            result = await request.json()
-            hook_name = result['webhookEvent'].replace(':', '_')
-            hook = getattr(self, 'wh_{}'.format(hook_name), None)
-            if hook:
-                hook(result)
-            return self.web.Response(status=200)
-        return self.web.Response(body="It works!", status=200)
+    async def POST(self, request):
+        result = await request.json()
+        hook_name = result['webhookEvent'].replace(':', '_')
+        hook = getattr(self, 'wh_{}'.format(hook_name), None)
+        if hook:
+            hook(result)
+        return self.web.Response(status=200)
 
     def wh_jira_issue_created(self, result):
         template = (
