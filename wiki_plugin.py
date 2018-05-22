@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from urllib.parse import quote
 
 import irc3
+from irc3.plugins.command import command
 
 from utils import WebhookPlugin
 
@@ -12,7 +13,6 @@ __all__ = ['Plugin']
 @irc3.plugin
 class Plugin(WebhookPlugin):
 
-
     def __init__(self, bot):
         super().__init__(bot)
         self.silent_pages = {}
@@ -21,7 +21,7 @@ class Plugin(WebhookPlugin):
     async def POST(self, request):
         result = await request.json()
         template = "Wiki {type}: Page: \x0311{title}\017 by \x0310{user}\017"
-        if result.get('comment')
+        if result.get('comment'):
             template += " Comment: \x0310{comment}\017"
         template += " http://{server_name}/{slug}"
         title = result.get('title', '')
@@ -36,8 +36,7 @@ class Plugin(WebhookPlugin):
             return self.web.Response(status=200)
         self.last_page = title
         self.silent_pages[title] = datetime.now() + timedelta(minutes=5)
-
-        message = template.format(link=link, **result)
+        message = template.format(**result)
         self.bot.notice('#funtoo', message)
         return self.web.Response(status=200)
 
