@@ -20,6 +20,12 @@ class Plugin:
                 'No webhook_key is set. Your webhook is insecure')
         self.server = None
 
+    def get_channel(self, project):
+        if project in ['FL', 'QA', 'KEYC']:
+            return '#funtoo-dev'
+        if project == 'BRZ':
+            return '#breezyops'
+
     def server_ready(self):
         if self.server is not None:
             return
@@ -39,6 +45,9 @@ class Plugin:
         return self.web.Response(status=200)
 
     def wh_jira_issue_created(self, result):
+        channel = self.get_channel(result['project']['key'])
+        if not channel:
+            return
         template = (
             "\x0311{user}\017 reported an issue: \x039{summary} "
             "\x0310[{type}]\017 {link}"
@@ -49,9 +58,12 @@ class Plugin:
             type=result['issue']['fields']['issuetype']['name'],
             link='https://bugs.funtoo.org/browse/' + result['issue']['key'],
         )
-        self.bot.notice('#funtoo-dev', message)
+        self.bot.notice(channel, message)
 
     def wh_jira_issue_updated(self, result):
+        channel = self.get_channel(result['project']['key'])
+        if not channel:
+            return
         msg_data = dict(
             id=result['issue']['key'],
             user=result['user']['name'],
@@ -109,12 +121,14 @@ class Plugin:
         if not template:
             return
         message = template.format(**msg_data)
-        self.bot.notice('#funtoo-dev', message)
+        self.bot.notice(channel, message)
 
-    @privmsg(r'.*\b(?P<issue>(FL|QA|KEYC)-\d+)\b')
+    @privmsg(r'.*\b(?P<issue>(FL|QA|KEYC|BRZ)-\d+)\b')
     def show_issue(self, mask, target, issue):
         if not target.startswith('#'):
             target = mask.split('!')[0]
+        if target != self.get_channel(issue.split('-')[0]):
+            return
         url = 'https://bugs.funtoo.org/rest/api/2/issue/' + issue
         r = requests.get(url)
         result = r.json()
