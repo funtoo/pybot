@@ -2,13 +2,13 @@
 import irc3
 import requests
 
-from utils import privmsg
+from utils import privmsg, WebhookPlugin
 
 __all__ = ['Plugin']
 
 
 @irc3.plugin
-class Plugin:
+class Plugin(WebhookPlugin):
 
     def __init__(self, bot):
         self.web = irc3.utils.maybedotted('aiohttp.web')
@@ -25,16 +25,6 @@ class Plugin:
             return '#funtoo-dev'
         if project == 'BRZ':
             return '#breezyops'
-
-    def server_ready(self):
-        if self.server is not None:
-            return
-        server = self.web.Server(self.handler, loop=self.bot.loop)
-        host = self.config.get('host', '127.0.0.1')
-        port = int(self.config.get('port', 8080))
-        self.bot.log.info('Starting web interface on %s:%s...', host, port)
-        self.server = self.bot.create_task(
-            self.bot.loop.create_server(server, host, port))
 
     async def POST(self, request):
         result = await request.json()
