@@ -37,11 +37,10 @@ class WebhookPlugin:
         if self.webhook_key:
             if request.headers.get('X-Api-Key') != self.webhook_key:
                 return self.web.Response(body="Wrong API key", status=403)
-        handler = getattr(self, request.method, handler)
+        handler = getattr(self, request.method, None)
         if handler:
             return await handler(request)
         return self.web.Response(status=405)
 
     async def GET(self, request):
         return self.web.Response(body="It works!", status=200)
-
