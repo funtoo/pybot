@@ -35,7 +35,7 @@ class Plugin(WebhookPlugin):
         return self.web.Response(status=200)
 
     def wh_jira_issue_created(self, result):
-        channel = self.get_channel(result['project']['key'])
+        channel = self.get_channel(result['issue']['project']['key'])
         if not channel:
             return
         template = (
@@ -51,7 +51,7 @@ class Plugin(WebhookPlugin):
         self.bot.notice(channel, message)
 
     def wh_jira_issue_updated(self, result):
-        channel = self.get_channel(result['project']['key'])
+        channel = self.get_channel(result['issue']['project']['key'])
         if not channel:
             return
         msg_data = dict(
