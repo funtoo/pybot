@@ -2,7 +2,7 @@
 import irc3
 import requests
 
-from utils import privmsg, WebhookPlugin
+from utils import privmsg, WebhookPlugin, C
 
 __all__ = ['Plugin']
 
@@ -39,8 +39,8 @@ class Plugin(WebhookPlugin):
         if not channel:
             return
         template = (
-            "\x0311{user}\017 reported an issue: \x039{summary} "
-            "\x0310[{type}]\017 {link}"
+            C.cyan("{user}") + " reported an issue: " +
+            C.light_green("{summary}") + " " + C.teal("[{type}]") + " {link}"
         )
         message = template.format(
             user=result['user']['name'],
@@ -64,8 +64,8 @@ class Plugin(WebhookPlugin):
         event = result['issue_event_type_name']
         if event == 'issue_commented':
             template = (
-                "\x0311{user}\017 commented on \x0311{id}\017: "
-                "\x039{summary}\017 {link}"
+                C.cyan("{user}") + " commented on " + C.cyan("{id}") + ": " +
+                C.light_green("{summary}") + " {link}"
             )
             msg_data['summary'] = \
                 result['comment']['body'].splitlines()[0][:100]
@@ -88,24 +88,27 @@ class Plugin(WebhookPlugin):
                     if old_assignee == msg_data['user']:
                         message = "unassigned himself"
                     else:
-                        message = "unassigned \x0313{old}\017"
+                        message = "unassigned " + C.pink("{old}")
                 else:
-                    message = "assigned \x0313{new}\017"
+                    message = "assigned " + C.pink("{new}")
                 if old_assignee and new_assignee:
                     if old_assignee == msg_data['user']:
                         message += " (instead of himself)"
                     else:
-                        message += " (instead of \x0313{old}\017)"
+                        message += " (instead of " + C.pink("{old}") + ")"
                 changes.append(
                     message.format(old=old_assignee, new=new_assignee))
             if old_status != new_status:
-                message = "set status \x0313{new}\017 (was: \x0313{old}\017)"
+                message = (
+                    "set status " + C.pink("{new}") +
+                    " (was: " + C.pink("{old}") + ")"
+                )
                 changes.append(
                     message.format(old=old_status, new=new_status))
             if changes:
                 template = (
-                    "\x0311{user}\017 {changes} on \x0311{id}\017 ("
-                    "\x039{summary}\017) {link}"
+                    C.cyan("{user}") + " {changes} on " + C.cyan("{id}") +
+                    " (" + C.light_green("{summary}") + ") {link}"
                 )
                 msg_data['changes'] = ' and '.join(changes)
         if not template:
@@ -126,8 +129,9 @@ class Plugin(WebhookPlugin):
             self.bot.privmsg(target, ' ; '.join(result['errorMessages']))
             return
         template = (
-            "\x0311{id}\x039 {summary} \x0310[{type}]\x0313 "
-            "Status: {status_name} ({status_cat})\017 {link}"
+            C.cyan("{id}") + " " + C.light_green("{summary}") + " " +
+            C.teal("[{type}]") + " " +
+            C.pink("Status: {status_name} ({status_cat})") + " {link}"
         )
         message = template.format(
             id=result['key'],
