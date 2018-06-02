@@ -72,68 +72,90 @@ class C:
     GREY = '14'
     LIGHT_GREY = '15'
 
+    @classmethod
     def _format(cls, fmt, text):
         return fmt + text + (cls.RESET if text[-1] != cls.RESET else '')
 
+    @classmethod
     def bold(cls, text):
         return cls._format(cls.BOLD, text)
 
+    @classmethod
     def color(cls, text, color):
         return cls._format(cls.COLOR + color, text)
 
+    @classmethod
     def italic(cls, text):
         return cls._format(cls.ITALIC, text)
 
+    @classmethod
     def underline(cls, text):
         return cls._format(cls.UNDERLINE, text)
 
+    @classmethod
     def reverse(cls, text):
         return cls._fomat(cls.REVERSE, text)
 
+    @classmethod
     def white(cls, text):
         return cls.color(text, cls.WHITE)
 
+    @classmethod
     def black(cls, text):
         return cls.color(text, cls.BLACK)
 
+    @classmethod
     def blue(cls, text):
         return cls.color(text, cls.BLUE)
 
+    @classmethod
     def green(cls, text):
         return cls.color(text, cls.GREEN)
 
+    @classmethod
     def red(cls, text):
         return cls.color(text, cls.red)
 
+    @classmethod
     def brown(cls, text):
         return cls.color(text, cls.BROWN)
 
+    @classmethod
     def purple(cls, text):
         return cls.color(text, cls.PURPLE)
 
+    @classmethod
     def orange(cls, text):
         return cls.color(text, cls.ORANGE)
 
+    @classmethod
     def yellow(cls, text):
         return cls.color(text, cls.YELLOW)
 
+    @classmethod
     def light_green(cls, text):
         return cls.color(text, cls.LIGHT_GREEN)
 
+    @classmethod
     def teal(cls, text):
         return cls.color(text, cls.TEAL)
 
+    @classmethod
     def cyan(cls, text):
         return cls.color(text, cls.CYAN)
 
+    @classmethod
     def light_blue(cls, text):
         return cls.color(text, cls.LIGHT_GLUE)
 
+    @classmethod
     def pink(cls, text):
         return cls.color(text, cls.PINK)
 
+    @classmethod
     def grey(cls, text):
         return cls.color(text, cls.GREY)
 
+    @classmethod
     def light_grey(cls, text):
         return cls.color(text, cls.LIGHT_GREY)
