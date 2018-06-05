@@ -120,8 +120,6 @@ class Plugin(WebhookPlugin):
     def show_issue(self, mask, target, issue):
         if not target.startswith('#'):
             target = mask.split('!')[0]
-        if target != self.get_channel(issue.split('-')[0]):
-            return
         url = 'https://bugs.funtoo.org/rest/api/2/issue/' + issue
         r = requests.get(url)
         result = r.json()
